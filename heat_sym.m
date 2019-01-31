@@ -14,7 +14,7 @@ V_house = V_side1 * V_side2 * V_floor; %[m^3 = 10ft^3]
 %http://highperformanceinsulation.eu/wp-content/uploads/2016/08/Thermal_insulation_materials_made_of_rigid_polyurethane_foam.pdf
 k_ins_wall = 0.025; %Rigid polyurethane foam (PUR/PIR) insulation; [(W/(mK)])
 rho_ins = 30; %density [kg/m^3]
-ksp_ins = 1.5; %specific heat [kJ/(kgK)]
+c_ins = 1.5; %specific heat [kJ/(kgK)]
 A_ins = V_side1 * V_side2; %insulation Area [m^2]
 t_ins_wall = .30; %thickness; [m]
 
@@ -31,14 +31,18 @@ h_drum = 28.75 * 2.54 / 100; %[in] * [cm/in] * [m/cm] = [m]
 SA_drum_in = pi * 2 * r_drum_out * h_drum;
 t_ins_drum = .025; %[m]
 
-T_inside = 55 + 273; %[K]
-T_outside = -36.7 + 273; %[K]
+T_inside = 12.77 + 273; %[K]
+T_outside = -38.16 + 273; %[K]
 
 %find rate that heat leaves greenhouse
 Qdot_out = 6 * k_ins_wall * A_ins * (T_inside - T_outside) / t_ins_wall; %Heat transfered per second; [W]
 
+%storage water properties
 T_water = 366.483; %[K]
 
+c_water = 3.8204*1000 % [kJ/kgK]*[J/kJ] = [J/kgK] Isochoric heat capacity of water at 363K https://www.engineeringtoolbox.com/specific-heat-capacity-water-d_660.html
+
+rho_water = 963.33 %kg/m^3 https://water.usgs.gov/edu/density.html
 %assume: rate that heat is being replaced = rate of heat leaving the
 %greenhouse (steady-state) AKA Qdot_out = Qdot_in
 Qdot_in = Qdot_out;
@@ -56,7 +60,12 @@ t_storage = 7 * 24 * 3600; %[days] * [24hrs/1day] * [3600s/1hr] = [s]
 
 Q_storage = Qdot_in * t_storage; %[J/s] * [s] = [J]
 
+%if there's no new energy for a week, how much water would we need to keep
+%the temperature of the food production unit at a stable 25 degrees
+%celsius?
 
+m_water_storage = Q_storage/(c_water * T_water) %[J]/([J/kgK]*[K]) = [kg]
 
+v_water_storage = m_water_storage/rho_water %[kg]/[m^3/kg] = m^3
 
-
+v_water_storage_gallons = v_water_storage*264.172% [m^3]*[gallons/m^3] = [gallons]
